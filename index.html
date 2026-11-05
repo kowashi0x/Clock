@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      width: 800px;
+      height: 600px;
+      overflow: hidden;
+      min-height: 10em;
+      display: table-cell;
+      vertical-align: middle;
+      position: relative;
+    }
+    .date {
+      font-size: 104px;
+      font-weight: bold;
+      color: #00FFCC;
+      margin-top: 20px;
+    }
+    .day {
+      font-size: 44px;
+      color: #ffa500 ;
+      margin-top: -5px;
+    }
+    .time {
+      font-size: 76px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    /* それぞれの色を指定（例：時=赤、分=青、秒=緑） */
+    .time_HH {
+      color: #FFFFFF;
+    }
+    .time_MM {
+      color: #00bfff;
+    }
+    .time_SS {
+      color: #ffa500;
+    }
+  </style>
+</head>
+<body>
+  <div class="date" id="date">--/--</div>
+  <div class="day" id="day">---</div>
+  <div class="time" id="time">--:--</div>
+  <script>
+    function update() {
+      const now = new Date();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const SS = String(now.getSeconds()).padStart(2, '0'); // 変数名は大文字の SS
+      
+      document.getElementById('date').textContent = `${m}/${d}`;
+      document.getElementById('day').textContent = days[now.getDay()];
+
+      // innerHTML で埋め込む際、${SS} と大文字に合わせる
+      document.getElementById('time').innerHTML = `
+        <span class="time_HH">${hh}</span>:<span class="time_MM">${mm}</span>:<span class="time_SS">${SS}</span>
+      `;    
+    }
+    setInterval(update, 1000);
+    update();
+  </script>
+</body>
+</html>
