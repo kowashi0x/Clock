@@ -19,30 +19,31 @@
       position: relative;
     }
     .date {
-      font-size: 104px;
+      font-size: 84px;
       font-weight: bold;
       color: #00FFCC;
-      margin-top: 20px;
+      margin-top: 10px;
     }
     .day {
-      font-size: 88px;
-      color: #ffa500 ;
+      font-size: 64px;
+      color: #ffa500;
       margin-top: -5px;
     }
     .time {
-      font-size: 108px;
+      font-size: 96px;
       font-weight: bold;
-      margin-top: 15px;
+      margin-top: 5px;
     }
-    /* それぞれの色を指定（例：時=赤、分=青、秒=緑） */
-    .time_HH {
-      color: #FFFFFF;
-    }
-    .time_MM {
-      color: #ffa500;
-    }
-    .time_SS {
-      color: #00bfff;
+    .time_HH { color: #FFFFFF; }
+    .time_MM { color: #ffa500; }
+    .time_SS { color: #00bfff; }
+
+    /* 天気・気温エリアのスタイル */
+    .weather {
+      font-size: 40px;
+      font-weight: bold;
+      color: #76ff03;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -50,26 +51,62 @@
   <div class="date" id="date">--/--</div>
   <div class="day" id="day">---</div>
   <div class="time" id="time">--:--</div>
+  <!-- 天気表示欄を追加 -->
+  <div class="weather" id="weather">大阪: 取得中...</div>
+
   <script>
-    function update() {
+    function updateClock() {
       const now = new Date();
       const m = String(now.getMonth() + 1).padStart(2, '0');
       const d = String(now.getDate()).padStart(2, '0');
       const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
       const hh = String(now.getHours()).padStart(2, '0');
       const mm = String(now.getMinutes()).padStart(2, '0');
-      const SS = String(now.getSeconds()).padStart(2, '0'); // 変数名は大文字の SS
-      
+      const SS = String(now.getSeconds()).padStart(2, '0');
+
       document.getElementById('date').textContent = `${m}/${d}`;
       document.getElementById('day').textContent = days[now.getDay()];
 
-      // innerHTML で埋め込む際、${SS} と大文字に合わせる
       document.getElementById('time').innerHTML = `
         <span class="time_HH">${hh}</span>:<span class="time_MM">${mm}</span>:<span class="time_SS">${SS}</span>
-      `;    
+      `;
     }
-    setInterval(update, 1000);
-    update();
+
+    // 天気コードを日本語表記に変換
+    function getWeatherText(code) {
+      if (code === 0) return '晴れ ☀️';
+      if ([1, 2, 3].includes(code)) return '晴れ/曇り ⛅';
+      if ([45, 48].includes(code)) return '霧 🌫️';
+      if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return '雨 🌧️';
+      if ([71, 73, 75, 77, 85, 86].includes(code)) return '雪 ❄️';
+      if ([95, 96, 99].includes(code)) return '雷雨 ⚡';
+      return '曇り ☁️';
+    }
+
+    // 大阪の天気・気温を取得する関数
+    async function updateWeather() {
+      try {
+        // 大阪の座標（緯度: 34.6937, 経度: 135.5023）
+        const url = 'https://api.open-meteo.com/v1/forecast?latitude=34.6937&longitude=135.5023&current=temperature_2m,weather_code&timezone=Asia%2FTokyo';
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        const temp = Math.round(data.current.temperature_2m);
+        const weatherText = getWeatherText(data.current.weather_code);
+        
+        document.getElementById('weather').textContent = `大阪: ${weatherText} ${temp}℃`;
+      } catch (error) {
+        document.getElementById('weather').textContent = '大阪: 天気取得失敗';
+      }
+    }
+
+    // 時計の更新（1秒ごと）
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // 天気の更新（起動時 ＋ 15分ごと）
+    updateWeather();
+    setInterval(updateWeather, 15 * 60 * 1000);
   </script>
 </body>
 </html>
