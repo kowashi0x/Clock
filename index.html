@@ -1,58 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <title>Cyber Calendar & Clock</title>
   <style>
     body {
-      background: #000;
+      background: #050508;
       color: #fff;
-      font-family: sans-serif;
-      text-align: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      width: 800px;
+      width: 920px; /* 必要最小限の幅まで縮小 */
       height: 600px;
       overflow: hidden;
-      min-height: 10em;
-      display: table-cell;
-      vertical-align: middle;
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
     }
-    .date {
-      font-size: 84px;
+
+    /* メインコンテナ */
+    .dashboard {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      gap: 20px;
+      box-sizing: border-box;
+    }
+
+    /* 左側：LED風 1ヶ月カレンダーエリア */
+    .calendar-panel {
+      width: 480px;
+      display: flex;
+      flex-direction: column;
+      background: rgba(20, 20, 30, 0.6);
+      border: 1px solid #1f293d;
+      border-radius: 16px;
+      padding: 20px;
+      box-sizing: border-box;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .calendar-title {
+      font-size: 24px;
       font-weight: bold;
       color: #00FFCC;
-      margin-top: 10px;
+      margin-bottom: 12px;
+      text-align: center;
+      letter-spacing: 1px;
     }
-    .day {
-      font-size: 64px;
-      color: #ffa500;
-      margin-top: -5px;
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      flex: 1;
     }
-    .time {
-      font-size: 96px;
+
+    /* 曜日ヘッダー */
+    .day-header {
+      text-align: center;
       font-weight: bold;
+      font-size: 14px;
+      padding: 4px 0;
+      color: #6c7a89;
+    }
+    .day-header.sun { color: #ff4d4d; }
+    .day-header.sat { color: #4d94ff; }
+
+    /* カレンダーセル（LEDコマ風） */
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0d1117;
+      border: 1px solid #161b22;
+      border-radius: 6px;
+      font-size: 16px;
+      color: #30363d;
+      transition: all 0.3s ease;
+    }
+
+    /* 点灯コマ（当月の日付） */
+    .cell.active {
+      background: #12283a;
+      border-color: #1f4b70;
+      color: #79c0ff;
+      box-shadow: inset 0 0 6px rgba(0, 191, 255, 0.2);
+    }
+
+    /* 当日の強調コマ（LEDネオン発光） */
+    .cell.today {
+      background: #ff3300;
+      border-color: #ff6633;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 18px;
+      box-shadow: 0 0 15px rgba(255, 51, 0, 0.8), inset 0 0 8px rgba(255, 255, 255, 0.5);
+      transform: scale(1.08);
+      z-index: 2;
+    }
+
+    /* 右側：時計・天気エリア（幅を縮め、左詰めに変更） */
+    .clock-panel {
+      flex: 1; /* 残りのスペースを使用 */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start; /* すべて左詰め */
+      background: rgba(20, 20, 30, 0.6);
+      border: 1px solid #1f293d;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.05);
+      padding: 25px 30px;
+      box-sizing: border-box;
+    }
+
+    .date {
+      font-size: 64px;
+      font-weight: bold;
+      color: #00FFCC;
+      text-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
+      line-height: 1;
+    }
+
+    .day {
+      font-size: 48px;
+      color: #ffa500;
       margin-top: 5px;
+      text-shadow: 0 0 10px rgba(255, 165, 0, 0.4);
+      line-height: 1;
+    }
+
+    .time {
+      font-size: 64px;
+      font-weight: bold;
+      margin-top: 20px;
+      letter-spacing: 1px;
+      line-height: 1;
     }
     .time_HH { color: #FFFFFF; }
-    .time_MM { color: #ffa500; }
-    .time_SS { color: #00bfff; }
+    .time_MM { color: #ffa500; text-shadow: 0 0 10px rgba(255, 165, 0, 0.5); }
+    .time_SS { color: #00bfff; text-shadow: 0 0 10px rgba(0, 191, 255, 0.5); }
 
-    /* 天気・気温エリアのスタイル */
     .weather {
-      font-size: 40px;
+      font-size: 24px;
       font-weight: bold;
       color: #76ff03;
-      margin-top: 10px;
+      margin-top: 30px;
+      background: rgba(118, 255, 3, 0.1);
+      padding: 8px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(118, 255, 3, 0.3);
+      text-shadow: 0 0 8px rgba(118, 255, 3, 0.4);
     }
   </style>
 </head>
 <body>
-  <div class="date" id="date">--/--</div>
-  <div class="day" id="day">---</div>
-  <div class="time" id="time">--:--</div>
-  <!-- 天気表示欄を追加 -->
-  <div class="weather" id="weather">大阪: 取得中...</div>
+
+  <div class="dashboard">
+    <!-- 左パネル：1ヶ月カレンダー -->
+    <div class="calendar-panel">
+      <div class="calendar-title" id="calendar-title">2026年 --月</div>
+      <div class="calendar-grid" id="calendar"></div>
+    </div>
+
+    <!-- 右パネル：時計・日付・天気（左詰め＆コンパクト化） -->
+    <div class="clock-panel">
+      <div class="date" id="date">--/--</div>
+      <div class="day" id="day">---</div>
+      <div class="time" id="time">--:--</div>
+      <div class="weather" id="weather">大阪: 取得中...</div>
+    </div>
+  </div>
 
   <script>
     function updateClock() {
@@ -70,9 +191,61 @@
       document.getElementById('time').innerHTML = `
         <span class="time_HH">${hh}</span>:<span class="time_MM">${mm}</span>:<span class="time_SS">${SS}</span>
       `;
+
+      // 日付が変わったらカレンダーも更新
+      if (window.lastDate !== d) {
+        generateCalendar(now);
+        window.lastDate = d;
+      }
     }
 
-    // 天気コードを日本語表記に変換
+    // 1ヶ月カレンダー生成
+    function generateCalendar(now) {
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const todayDate = now.getDate();
+
+      document.getElementById('calendar-title').textContent = `${year}年 ${month + 1}月`;
+
+      const calendarEl = document.getElementById('calendar');
+      calendarEl.innerHTML = '';
+
+      // 曜日ヘッダー
+      const weekDays = ['日', '月', '火', '水', '木', '金', '土'];
+      weekDays.forEach((day, idx) => {
+        const header = document.createElement('div');
+        header.className = 'day-header';
+        if (idx === 0) header.classList.add('sun');
+        if (idx === 6) header.classList.add('sat');
+        header.innerText = day;
+        calendarEl.appendChild(header);
+      });
+
+      const firstDayOfWeek = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      // 前月の空コマ
+      for (let i = 0; i < firstDayOfWeek; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'cell';
+        calendarEl.appendChild(emptyCell);
+      }
+
+      // 当月の日付コマ
+      for (let date = 1; date <= daysInMonth; date++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell active';
+        cell.innerText = date;
+
+        if (date === todayDate) {
+          cell.classList.add('today');
+        }
+
+        calendarEl.appendChild(cell);
+      }
+    }
+
+    // 天気取得
     function getWeatherText(code) {
       if (code === 0) return '晴れ ☀️';
       if ([1, 2, 3].includes(code)) return '晴れ/曇り ⛅';
@@ -83,10 +256,8 @@
       return '曇り ☁️';
     }
 
-    // 大阪の天気・気温を取得する関数
     async function updateWeather() {
       try {
-        // 大阪の座標（緯度: 34.6937, 経度: 135.5023）
         const url = 'https://api.open-meteo.com/v1/forecast?latitude=34.6937&longitude=135.5023&current=temperature_2m,weather_code&timezone=Asia%2FTokyo';
         const response = await fetch(url);
         const data = await response.json();
@@ -100,11 +271,10 @@
       }
     }
 
-    // 時計の更新（1秒ごと）
+    // タイマー設定
     setInterval(updateClock, 1000);
     updateClock();
 
-    // 天気の更新（起動時 ＋ 15分ごと）
     updateWeather();
     setInterval(updateWeather, 15 * 60 * 1000);
   </script>
