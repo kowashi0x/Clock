@@ -45,7 +45,7 @@
     .calendar-title {
       font-size: 24px;
       font-weight: bold;
-      color: #00FFCC;
+      color: #ffff00;
       margin-bottom: 12px;
       text-align: center;
       letter-spacing: 1px;
@@ -64,10 +64,10 @@
       font-weight: bold;
       font-size: 14px;
       padding: 4px 0;
-      color: #6c7a89;
+      color: #FFF;
     }
-    .day-header.sun { color: #ff4d4d; }
-    .day-header.sat { color: #4d94ff; }
+    .day-header.sun { color: #ff0000; }
+    .day-header.sat { color: #0000ff; }
 
     /* カレンダーセル（LEDコマ風） */
     .cell {
@@ -84,19 +84,21 @@
 
     /* 点灯コマ（当月の日付） */
     .cell.active {
-      background: #12283a;
+      background: #000;
       border-color: #1f4b70;
-      color: #79c0ff;
+      font-weight: bold;
+      font-size: 42px;
+       color: #00ff00;
       box-shadow: inset 0 0 6px rgba(0, 191, 255, 0.2);
     }
 
     /* 当日の強調コマ（LEDネオン発光） */
     .cell.today {
-      background: #ff3300;
+      background: #000;
       border-color: #ff6633;
-      color: #ffffff;
+      color: #ff0000;
       font-weight: bold;
-      font-size: 18px;
+      font-size: 42px;
       box-shadow: 0 0 15px rgba(255, 51, 0, 0.8), inset 0 0 8px rgba(255, 255, 255, 0.5);
       transform: scale(1.08);
       z-index: 2;
@@ -126,7 +128,7 @@
     }
 
     .day {
-      font-size: 48px;
+      font-size: 64px;
       color: #ffa500;
       margin-top: 5px;
       text-shadow: 0 0 10px rgba(255, 165, 0, 0.4);
@@ -134,7 +136,7 @@
     }
 
     .time {
-      font-size: 64px;
+      font-size: 76px;
       font-weight: bold;
       margin-top: 20px;
       letter-spacing: 1px;
