@@ -62,7 +62,7 @@
     .day-header {
       text-align: center;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 28px;
       padding: 4px 0;
       color: #FFF;
     }
@@ -120,7 +120,7 @@
     }
 
     .date {
-      font-size: 64px;
+      font-size: 96px;
       font-weight: bold;
       color: #00FFCC;
       text-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
@@ -150,12 +150,22 @@
       font-size: 24px;
       font-weight: bold;
       color: #76ff03;
-      margin-top: 30px;
+      margin-top: 20px;
       background: rgba(118, 255, 3, 0.1);
-      padding: 8px 16px;
+      padding: 12px 16px;
       border-radius: 12px;
       border: 1px solid rgba(118, 255, 3, 0.3);
       text-shadow: 0 0 8px rgba(118, 255, 3, 0.4);
+      line-height: 1.4;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .temp-highlight {
+      font-size: 32px;
+      color: #FFFF00;
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
     }
   </style>
 </head>
@@ -164,7 +174,7 @@
   <div class="dashboard">
     <!-- 左パネル：1ヶ月カレンダー -->
     <div class="calendar-panel">
-      <div class="calendar-title" id="calendar-title">2026年 --月</div>
+      <div class="calendar-title" id="calendar-title">--年 --月</div>
       <div class="calendar-grid" id="calendar"></div>
     </div>
 
@@ -173,7 +183,7 @@
       <div class="date" id="date">--/--</div>
       <div class="day" id="day">---</div>
       <div class="time" id="time">--:--</div>
-      <div class="weather" id="weather">大阪: 取得中...</div>
+      <div class="weather" id="weather">大阪<br>取得中...<br>京都<br>取得中...</div>
     </div>
   </div>
 
@@ -260,16 +270,31 @@
 
     async function updateWeather() {
       try {
-        const url = 'https://api.open-meteo.com/v1/forecast?latitude=34.6937&longitude=135.5023&current=temperature_2m,weather_code&timezone=Asia%2FTokyo';
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        const temp = Math.round(data.current.temperature_2m);
-        const weatherText = getWeatherText(data.current.weather_code);
-        
-        document.getElementById('weather').textContent = `大阪: ${weatherText} ${temp}℃`;
+        const osakaUrl = 'https://api.open-meteo.com/v1/forecast?latitude=34.6937&longitude=135.5023&current=temperature_2m,weather_code&timezone=Asia%2FTokyo';
+        const kyotoUrl = 'https://api.open-meteo.com/v1/forecast?latitude=35.0116&longitude=135.7681&current=temperature_2m,weather_code&timezone=Asia%2FTokyo';
+
+        const [osakaRes, kyotoRes] = await Promise.all([
+          fetch(osakaUrl),
+          fetch(kyotoUrl)
+        ]);
+
+        const osakaData = await osakaRes.json();
+        const kyotoData = await kyotoRes.json();
+
+        const osakaTemp = Math.round(osakaData.current.temperature_2m);
+        const osakaWeather = getWeatherText(osakaData.current.weather_code);
+
+        const kyotoTemp = Math.round(kyotoData.current.temperature_2m);
+        const kyotoWeather = getWeatherText(kyotoData.current.weather_code);
+
+        document.getElementById('weather').innerHTML = `
+          大阪<br>
+          ${osakaWeather} <span class="temp-highlight">${osakaTemp}℃</span><br>
+          京都<br>
+          ${kyotoWeather} <span class="temp-highlight">${kyotoTemp}℃</span>
+        `;
       } catch (error) {
-        document.getElementById('weather').textContent = '大阪: 天気取得失敗';
+        document.getElementById('weather').textContent = '天気取得失敗';
       }
     }
 
