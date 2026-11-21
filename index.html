@@ -42,11 +42,12 @@
     }
 
     .calendar-title {
-      font-size: 42px;
+      font-size: 50px;
       font-weight: bold;
-      color: #ffff00;
+      color: #ffffff;
       text-align: center;
-      margin-bottom: 8px;
+      margin-top: 16px;
+      margin-bottom: 32px;
       line-height: 1.15;
     }
 
@@ -55,14 +56,15 @@
       grid-template-columns: repeat(7, 1fr);
       grid-auto-rows: 1fr;
       gap: 6px;
-      flex: 1;
+      flex: 0.9;
       min-height: 0;
     }
 
     .day-header {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: right;
+      padding-right: 10px;
       font-weight: bold;
       font-size: 30px;
       color: #fff;
@@ -73,7 +75,8 @@
     .cell {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: right;
+      padding: 2px 10px 2px 4px;
       background: #0d1117;
       border: 1px solid #1b2230;
       border-radius: 6px;
@@ -114,12 +117,13 @@
     .time-row {
       display: flex;
       align-items: baseline;
-      gap: 12px;
+      gap: 14px;
       line-height: 1.05;
+      flex-shrink: 0;
     }
 
     .time {
-      font-size: 54px;
+      font-size: 62px;
       font-weight: bold;
       letter-spacing: 1px;
       text-align: left;
@@ -129,34 +133,47 @@
     .time_SS { color: #ffff00; }
 
     .weekday {
-      font-size: 34px;
+      font-size: 40px;
       font-weight: bold;
-      color: #00ffcc;
+      color: #00ff00;
       letter-spacing: 1px;
     }
+    .weekday.sun { color: #ff0000; }
+    .weekday.sat { color: #0000ff; }
 
-    /* 2. 天気 */
+    /* 2. 天気（大阪・京都を2行・大きめ文字で表示） */
     .weather {
-      font-size: 19px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      font-size: 24px;
       font-weight: bold;
       color: #76ff03;
       background: rgba(118, 255, 3, 0.08);
       border: 1px solid rgba(118, 255, 3, 0.3);
       border-radius: 12px;
       padding: 8px 14px;
-      line-height: 1.35;
+      line-height: 1.3;
       text-align: left;
     }
 
+    .weather-line {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .temp-highlight {
-      font-size: 22px;
+      font-size: 28px;
       color: #ffff00;
     }
 
-    /* 3. ニュース */
+    /* 3. ニュース（全体の約半分の高さ） */
     .news-panel {
-      flex: 1;
-      min-height: 155px;
+      height: 285px;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -166,7 +183,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      font-size: 14px;
       color: #ff9d00;
     }
 
@@ -177,11 +194,27 @@
       font-size: 12px;
       padding: 2px 8px;
       border-radius: 4px;
-      margin-right: 8px;
+      margin-right: 6px;
+    }
+
+    .news-updated-bar {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ffcc66;
+      background: rgba(255, 140, 0, 0.12);
+      border-left: 4px solid #ff8c00;
+      padding: 4px 12px;
+      border-radius: 6px;
+      line-height: 1.2;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .led-board {
       flex: 1;
+      min-height: 0;
       position: relative;
       background: #0a0602;
       border: 2px solid #2b1d0e;
@@ -197,7 +230,7 @@
       white-space: nowrap;
       text-decoration: none;
       color: #ff8c00;
-      font-size: 58px;
+      font-size: 64px;
       font-weight: 900;
       letter-spacing: 2px;
       will-change: transform;
@@ -216,12 +249,12 @@
     <div class="right-panel">
       <div class="time-row">
         <div class="time" id="time">--:--:--</div>
-        <div class="weekday" id="weekday">---</div>
+        <div class="weekday" id="weekday">-</div>
       </div>
 
       <div class="weather" id="weather">
-        大阪: 取得中...<br>
-        京都: 取得中...
+        <div class="weather-line">大阪: 取得中...</div>
+        <div class="weather-line">京都: 取得中...</div>
       </div>
 
       <div class="news-panel">
@@ -232,6 +265,7 @@
           </div>
           <span id="news-status">待機中...</span>
         </div>
+        <div class="news-updated-bar" id="news-updated-time">発表時間: --:--</div>
         <div class="led-board" id="led-board">
           <a class="ticker-link" id="ticker-item" target="_blank" rel="noopener noreferrer">
             ニュース待機中...
@@ -242,7 +276,7 @@
   </div>
 
   <script>
-    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyO6AwkRjyHI99_6D4DTsT_eQb_jsTe53W0Yte-wsdGg1kQTAkB6SDxT69dpSC6MLWA2Q/exec';
+    const GAS_API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnTsWKn8g7pT95EMOO1jweyQIl0CrciNl6u8q2IfAJkqidJbl_VJSOXU6Kr9wOzhDqb6I0vM7LDTkNqY4nHnUSV6luctynyD06VMM5rxCtQTRpFgCpx2xath9TXfSp8y7hvlPX9nBiSe57N74AoEvCy7iEiq6nlvZ8LR-lEqIQJAU0Z_H8SfZKuN9RQsEDtTgU7YNjQLWfwBCi6Uul6f1WnQANDJVYzjLBqhmLr3Dh537gk9Fx4-Hs59XuME4m1wcD6x3zxg9PofjPxNOeWeBQB755TNvQ&lib=MyQ7tZ_wQaCrJZ-kOtxTklmvRDGiYonds';
     const SCROLL_SPEED = 180;
 
     let lastDateKey = '';
@@ -303,7 +337,8 @@
     function updateClock() {
       try {
         const now = new Date();
-        const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        const days = ['日', '月', '火', '水', '木', '金', '土'];
+        const dayIndex = now.getDay();
         const hh = String(now.getHours()).padStart(2, '0');
         const mm = String(now.getMinutes()).padStart(2, '0');
         const ss = String(now.getSeconds()).padStart(2, '0');
@@ -316,7 +351,10 @@
 
         const weekdayEl = document.getElementById('weekday');
         if (weekdayEl) {
-          weekdayEl.textContent = days[now.getDay()];
+          weekdayEl.textContent = days[dayIndex];
+          weekdayEl.classList.remove('sun', 'sat');
+          if (dayIndex === 0) weekdayEl.classList.add('sun');
+          if (dayIndex === 6) weekdayEl.classList.add('sat');
         }
 
         const dateKey = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
@@ -361,10 +399,38 @@
         const kyotoWeather = getWeatherText(kyotoData.current.weather_code);
 
         weatherEl.innerHTML =
-          `大阪: ${osakaWeather} <span class="temp-highlight">${osakaTemp}℃</span><br>` +
-          `京都: ${kyotoWeather} <span class="temp-highlight">${kyotoTemp}℃</span>`;
+          `<div class="weather-line">大阪: ${osakaWeather} <span class="temp-highlight">${osakaTemp}℃</span></div>` +
+          `<div class="weather-line">京都: ${kyotoWeather} <span class="temp-highlight">${kyotoTemp}℃</span></div>`;
       } catch (err) {
         weatherEl.textContent = '大阪・京都: 天気取得失敗';
+      }
+    }
+
+    function formatPublishedTime(item) {
+      if (!item) return '--:--';
+      const raw =
+        item.pubDate ||
+        item.publishedAt ||
+        item.published ||
+        item.date ||
+        item.time ||
+        item.updated ||
+        '';
+      if (!raw) return '--:--';
+
+      const parsed = new Date(raw);
+      if (!Number.isNaN(parsed.getTime())) {
+        const hh = String(parsed.getHours()).padStart(2, '0');
+        const mm = String(parsed.getMinutes()).padStart(2, '0');
+        return `${hh}:${mm}`;
+      }
+      return String(raw);
+    }
+
+    function updatePublishedDisplay(item) {
+      const updatedEl = document.getElementById('news-updated-time');
+      if (updatedEl) {
+        updatedEl.textContent = `発表時間: ${formatPublishedTime(item)}`;
       }
     }
 
@@ -379,6 +445,7 @@
       if (counterEl) {
         counterEl.textContent = `[ ${String(currentIndex + 1).padStart(2, '0')} / ${String(newsList.length).padStart(2, '0')} ]`;
       }
+      updatePublishedDisplay(item);
       tickerEl.href = item.link || '#';
       tickerEl.textContent = item.title || '(タイトルなし)';
 
@@ -408,6 +475,7 @@
 
     async function fetchNews() {
       const statusEl = document.getElementById('news-status');
+      const updatedEl = document.getElementById('news-updated-time');
       const tickerEl = document.getElementById('ticker-item');
       if (statusEl) statusEl.textContent = '取得中...';
 
@@ -424,11 +492,11 @@
           throw new Error('データが空です');
         }
 
-        newsList = data.slice(0, 10);
-        const now = new Date();
+        newsList = data.slice(0, 12);
         if (statusEl) {
-          statusEl.textContent = `更新 ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} (${newsList.length}件)`;
+          statusEl.textContent = `取得完了 (${newsList.length}件)`;
         }
+        updatePublishedDisplay(newsList[0]);
 
         if (!animationStarted) {
           currentIndex = 0;
@@ -440,6 +508,9 @@
         clearTimeout(timer);
         if (statusEl) {
           statusEl.textContent = err.name === 'AbortError' ? 'タイムアウト' : '取得失敗';
+        }
+        if (updatedEl) {
+          updatedEl.textContent = '発表時間: --:--';
         }
         if (tickerEl) {
           tickerEl.textContent = 'ニュースを取得できませんでした';
